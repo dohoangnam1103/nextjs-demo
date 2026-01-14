@@ -1,13 +1,38 @@
 'use client';
 
 import { loginAction } from '@/actions/authActions';
-import { Button, Input, Card } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Button, Input, Card, Divider } from 'antd';
+import { UserOutlined, LockOutlined, GoogleOutlined } from '@ant-design/icons';
+import { signIn } from 'next-auth/react';
 
 export default function LoginPage() {
+    const handleGoogleSignIn = () => {
+        signIn('google', { callbackUrl: '/' });
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <Card title="Đăng nhập hệ thống" className="w-96 shadow-xl" variant="borderless">
+                {/* Google Sign In */}
+                <Button
+                    size="large"
+                    icon={<GoogleOutlined />}
+                    onClick={handleGoogleSignIn}
+                    className="w-full mb-4"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderColor: '#4285f4',
+                        color: '#4285f4'
+                    }}
+                >
+                    Đăng nhập bằng Google
+                </Button>
+
+                <Divider>Hoặc</Divider>
+
+                {/* Email/Password Form */}
                 <form action={loginAction}>
                     <div className="space-y-4">
                         <div>
