@@ -1,41 +1,29 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { decrypt } from '@/lib/session'
-import { cookies } from 'next/headers'
+import { auth } from "@/auth";
+import { NextResponse } from "next/server";
 
-// Các route cần bảo vệ (không login thì không được vào)
-const protectedRoutes = ['/', '/users']
-// Các route công khai (đã login rồi thì không được vào lại login)
-const publicRoutes = ['/login']
+export default auth((req) => {
+  const isLoggedIn = !!req.auth;
+  const { pathname } = req.nextUrl;
 
-export default async function middleware(req: NextRequest) {
-  // 1. Kiểm tra đường dẫn hiện tại
-  const path = req.nextUrl.pathname
-  const isProtectedRoute = protectedRoutes.includes(path) || path.startsWith('/users/')
-  const isPublicRoute = publicRoutes.includes(path)
- 
-  // 2. Lấy cookie session
-  // Lưu ý: Middleware chạy ở Edge, nên cách lấy cookie hơi khác Server Component một chút
-  // Nhưng req.cookies.get là cách chuẩn trong Middleware
-  const cookie = req.cookies.get('session')?.value
-  const session = await decrypt(cookie)
- 
-  // 3. Logic Redirect
+  // Protected routes
+  const isProtectedRoute = pathname === '/' || pathname.startsWith('/users');
   
-  // Nếu vào trang bảo vệ mà chưa login -> Đá về /login
-  if (isProtectedRoute && !session?.userId) {
-    return NextResponse.redirect(new URL('/login', req.nextUrl))
+  // Public routes
+  const isPublicRoute = pathname === '/login';
+
+  // Redirect to login if accessing protected route without auth
+  if (isProtectedRoute && !isLoggedIn) {
+    return NextResponse.redirect(new URL('/login', req.nextUrl));
   }
- 
-  // Nếu đã login mà cố tình vào /login -> Đá về / (Trang chủ)
-  if (isPublicRoute && session?.userId) {
-    return NextResponse.redirect(new URL('/', req.nextUrl))
+
+  // Redirect to home if accessing login while authenticated
+  if (isPublicRoute && isLoggedIn) {
+    return NextResponse.redirect(new URL('/', req.nextUrl));
   }
- 
-  return NextResponse.next()
-}
- 
-// Config để Middleware chỉ chạy trên các route cần thiết (Tối ưu performance)
+
+  return NextResponse.next();
+});
+
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
-}
+};

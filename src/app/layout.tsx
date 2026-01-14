@@ -18,18 +18,18 @@ export const metadata: Metadata = {
 };
 
 import QueryProvider from "@/providers/QueryProvider";
-import { ConfigProvider, theme, App } from "antd";
-import { getSession } from "@/lib/session";
+import { ConfigProvider, App } from "antd";
+import { auth } from "@/auth";
 import UserHeader from "@/components/UserHeader";
 
 export default async function RootLayout({
   children,
-  modal, // Nhận thêm prop modal
+  modal,
 }: Readonly<{
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-  const session = await getSession();
+  const session = await auth();
 
   return (
     <html lang="en">
@@ -41,7 +41,7 @@ export default async function RootLayout({
           <ConfigProvider>
             <App>
               {/* Header hiển thị user info */}
-              <UserHeader user={session} />
+              <UserHeader user={session?.user} />
               {children}
               {modal} {/* Render Modal Slot ở đây */}
             </App>

@@ -14,6 +14,8 @@ export interface User {
   email: string
   phone?: string // Optional
   website?: string 
+  image?: string | null
+  emailVerified?: Date | null
   company?: {     
     name: string
     catchPhrase?: string
