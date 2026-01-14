@@ -16,30 +16,46 @@ export async function deleteUserAction(userId: number) {
 }
 
 // Action Thêm User Mới
-export async function addUserAction(formData: FormData) {
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
+import { CreateUserSchema } from '@/lib/schemas';
 
-    // Validate cơ bản
-    if (!name || !email) {
-        return { success: false, message: 'Vui lòng nhập tên và email' };
+// Action Thêm User Mới (Validation with Zod)
+export async function addUserAction(formData: FormData) {
+    // 1. Lấy và chuẩn hóa dữ liệu từ Form
+    const rawData = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        // Các trường này hiện UI chưa gửi lên, nhưng ta cứ get sẵn để sau này mở rộng
+        phone: formData.get('phone') || undefined,
+        website: formData.get('website') || undefined,
+        companyName: formData.get('companyName') || undefined,
+    };
+
+    // 2. Validate bằng Zod Safe Parse (Không throw error)
+    const result = CreateUserSchema.safeParse(rawData);
+
+    // 3. Nếu validate thất bại
+    if (!result.success) {
+        // Lấy lỗi đầu tiên để hiển thị đơn giản
+        const errorMessage = result.error.issues[0].message;
+        return { success: false, message: errorMessage };
     }
+
+    // 4. Validate thành công -> Dùng data sạch
+    const data = result.data;
 
     try {
         await userService.createUser({
-            name,
-            email,
-            // Mock các trường khác
-            username: email.split('@')[0],
-            phone: '0987654321',
-            website: 'example.com',
-            company: { name: 'New Company Inc', catchPhrase: 'Growth & Innovation' }
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            website: data.website,
+            company: data.companyName ? { name: data.companyName } : { name: 'New User Company' }
         });
 
-        revalidatePath('/'); // Làm mới danh sách tức thì
+        revalidatePath('/');
         return { success: true, message: 'Thêm người dùng mới thành công!' };
     } catch (error) {
         console.error('Add User Error:', error);
-        return { success: false, message: 'Lỗi khi thêm người dùng (Email trùng?)' };
+        return { success: false, message: 'Lỗi: Email có thể đã tồn tại' };
     }
 }

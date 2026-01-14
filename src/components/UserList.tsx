@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo, useCallback, useOptimistic, startTransition, useRef } from 'react';
-import { Modal, Button, Input, Form, App } from 'antd';
+import { useState, useCallback, useOptimistic, startTransition, useRef } from 'react';
+import { Modal, Button, Input, App } from 'antd';
 import { type User } from '../types/common';
 import { SearchOutlined, UserAddOutlined } from '@ant-design/icons';
 
@@ -167,7 +167,7 @@ export const UserList = ({ initialUsers }: { initialUsers: User[] }) => {
 
                 {optimisticUsers.length === 0 && (
                     <div className="text-center text-gray-500 py-8">
-                        Không tìm thấy user nào khớp với "{searchTerm}".
+                        Không tìm thấy user nào khớp với &quot;{searchTerm}&quot;.
                     </div>
                 )}
             </ul>
@@ -192,7 +192,7 @@ export const UserList = ({ initialUsers }: { initialUsers: User[] }) => {
                 <form action={handleAddUser} className="space-y-4 pt-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Tên</label>
-                        <Input name="name" placeholder="Ví dụ: Nguyễn Văn A" required />
+                        <Input name="name" placeholder="Ví dụ: Nguyễn Văn A" required minLength={2} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Email</label>
