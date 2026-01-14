@@ -22,6 +22,9 @@ export const userService = {
     return users.map((u: any) => ({
         ...u,
         id: u.id, 
+        username: u.username || undefined, // Convert null -> undefined
+        phone: u.phone || undefined,
+        website: u.website || undefined,
         company: u.company as any || {}, 
     }));
   },
@@ -42,6 +45,9 @@ export const userService = {
 
         return {
             ...user,
+            username: user.username || undefined, // Fix here too
+            phone: user.phone || undefined,
+            website: user.website || undefined,
             company: user.company as any || {},
         };
       },
