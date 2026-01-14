@@ -23,7 +23,6 @@ export const userService = {
         ...u,
         id: u.id, 
         company: u.company as any || {}, 
-        address: {}, 
     }));
   },
 
@@ -44,7 +43,6 @@ export const userService = {
         return {
             ...user,
             company: user.company as any || {},
-            address: {}
         };
       },
       [`user-detail-${userId}`],
